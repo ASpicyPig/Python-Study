@@ -3512,3 +3512,882 @@ print(arr[1,...])
 print("-----------")
 print(arr[...,1:])
 ```
+### 高级索引
+
+NumPy 比一般的 Python 序列提供更多的索引方式。除了之前看到的用整数和切片的索引外，数组可以由整数数组索引、布尔索引
+
+> 整数数组索引
+
+分别拿出（0，0） （1，1） （2，0）
+
+```python
+import numpy as np
+arr = np.array([1, 2, 3],[4, 5, 6],[7, 8, 9])
+
+# 0,0 1,1 2,0
+print(arr)
+print(arr[[0, 1, 2],[0, 1, 0]])
+```
+
+分别拿行索引是[0, 0],[3,3],而列索引是[0,2],[0,2], 即四个角上的元素
+
+```python
+import numpy as np
+arr = np.array([[0, 1, 2],[3, 4, 5],[6, 7, 8],[9, 10, 11]])
+print('我们的数组是:')
+print(arr)
+print('\n')
+rows = np.array([[0, 0], [3, 3]])
+cols = np.array([[0, 2], [0, 2]])
+arr2 = arr[rows, cols]
+```
+
+> 借助切片:或...与索引数组组合
+
+```python
+import numpy as np
+arr = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]])
+print(arr)
+print("")
+print(arr[1:3, 1:3])
+print("")
+print(arr[1:3, [1, 2]])
+print("")
+print(arr[..., 1:])
+```
+
+> 布尔索引
+
+布尔索引通过布尔运算(如:比较运算符)来获取符合指定条件的元素的数组
+
+- 打印大于5的元素
+
+```python
+import numpy as np
+arr = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]])
+
+print(arr[arr>5])
+```
+
+- 使用~(取补运算符来过滤NaN)
+
+```python
+import numpy as np
+arr = np.array([np.nan, 1, 2, np.nan, 3, 4, 5])
+print(arr[~np.isnan(arr)])
+```
+
+### 广播
+
+numpy 对不同形状(shape)的数组进行数值计算的方式，对数组的算术运算通常在相应的元素上进行
+
+**形状相同**
+
+如果两个数组a和b形状相同，即满足a.shape ==b.shape，那么 a+b 的结果就是a与b数组对应位相加。这要求维数相同，且各维度的长度相同
+
+```python
+import numpy as np
+a = np.array([1, 2, 3, 4])
+b = np.array([10, 20, 30, 40])
+c = a + b
+print(c)
+
+```
+
+**形状不同**
+
+如果两个数组的维数不相同，则元素到元素的操作是不可能的。然而，在 NumPy 中仍然可以对形状不相似的数组进行操作，因为它拥有广播功能。较小的数组会广播到较大数组的大小，以便使它们的形状可兼容
+
+```python
+import numpy as np
+a = np.array([[0,0,0],[10,10,10],[20,20,20],[30,30,30]])
+b = np.array([1, 2, 3])
+print(a + b)
+```
+
+![1766110505176](image/Note/1766110505176.png)
+
+```python
+import numpy as np
+a = np.array([0, 0, 0],[10, 10, 10],[20, 20, 20],[30, 30, 30])
+b = np.array([1, 2, 3])
+bb = np.tile(b, (4, 1))
+print(bb)
+print("-------------")
+print(a + bb)
+```
+
+> 广播的规则
+
+- 让所有输入数组都向其中形状最长的数组看齐，形状中不足的部分都通过在前面加1补齐
+- 输出数组的形状是输入数组形状的各个维度上的最大值
+- 如果输入数组的某个维度和输出数组的对应维度的长度相同或者其长度为1时，这个数组能够用来计算，否则出错
+- 当输入数组的某个维度的长度为1时，沿着此维度运算时都用此维度上的第一组值
+
+> 简单理解
+
+对两个数组，分别比较他们的每一个维度(若其中一个数组没有当前维度则忽略)，满足
+
+- 数组拥有相同形状
+- 当前维度的值相等
+- 当前维度的值有一个是 1
+
+若条件不满足:抛出"ValueError: frames are not aligned" 异常
+
+### 迭代
+
+> numpy.nditer基本使用
+
+它是一个有效的多维迭代器对象，可以用在数组上进行选代。数组的每个元素可使用Python 的标准Iterator接口来访问
+
+- 基本使用
+
+```python
+import numpy as np
+a = np.arange(12)
+a = a.reshape(3, 4)
+print(a)
+print("--------")
+for x in np.nditer(a):
+	print(x, end = ",")
+print("")
+```
+
+注:
+
+> 不是使用标准C或者 Fortran 顺序，选择的顺序是和数组内存布局一致的，这样做是为了提升访问的效率，默认是行序优先(row-majororder，或者说是C-order)
+
+> 反映了默认情况下只需访问每个元素，而无需考虑其特定顺序
+
+> 可以通过迭代上述数组的转置来看到这一点，并与以C顺序访问数组转置的 copy方式做对比
+
+a和 a.T的遍历顺序是一样的，也就是他们在内存中的存储顺序也是一样的，但是a.T.copy(order='C')的遍历结果是不同的，那是因为它和前两种的存储方式是不一样的，默认是按行访问
+
+```python
+import numpy as np
+
+a = np.arange(12)
+a = a.reshape(3, 4)
+print(a)
+print("")
+for x in np.nditer(a.T):
+	print(x, end=",")
+print("")
+print("------------------")
+b = a.T.copy(order='C')
+print(b)
+print("")
+for x in np.nditer(b):
+	print(x, end =", ")
+print("")
+```
+
+> 控制遍历顺序
+
+
+
+| 顺序          | 说明     | 使用方式                                |
+| ------------- | -------- | --------------------------------------- |
+| Fortran order | 列序优先 | `for x in np.nditer(a, order='F'):`   |
+| C order       | 行序优先 | `for x in np.nditer(a.T, order='C'):` |
+
+```python
+# 隐式设置
+import numpy as np
+a = np.arange(12)
+a = a.reshape(3, 4)
+
+print("原始数组:")
+print(a)
+print("")
+
+print("原始数组转置:")
+b = a.T
+print(b)
+print("")
+
+print('以C风格顺序排序:')
+c = b.copy(order='C')
+print(c)
+for x in np.nditer(c):
+	print(x, end=",")
+print("")
+d = b.copy(order='F')
+print(c)
+for x in np.nditer(d):
+	print(x, end=",")
+print("")
+```
+
+```python
+import numpy as np
+a = np.arange(12)
+a = a.reshape(3, 4)
+
+for x in np.nditer(a, order='C'):
+	print(x, end=",")
+print("")
+for x in np.nditer(a, order='F'):
+	# 此处的x是只读的
+	print(x, end=",")
+print("")
+for x in np.nditer(a, order='F', op_flags=["readwrite"]):
+	# 这里就是可写的了
+	x[...] = x * 2
+print("")
+print(a)
+```
+
+> 外部循环
+
+nditer类的构造器拥有flags参数，它可以接受下列值
+
+| 值            | 说明                                           |
+| ------------- | ---------------------------------------------- |
+| c_index       | 可以跟踪 C 顺序的索引                          |
+| f_index       | 可以跟踪 Fortran 顺序的索引                    |
+| multi-index   | 每次迭代可以跟踪一种索引类型                   |
+| external_loop | 给出的值是具有多个值的一维数组，而不是零维数组 |
+
+迭代器遍历对应于每列的一维数组
+
+```python
+import numpy as np
+
+a = np.arange(12)
+a = a.reshape(3, 4)
+print("原始数组:")
+print(a)
+print("")
+for x in np.nditer(a, flags=["c_index"]):
+	print(x, end=", ")
+for x in np.nditer(a, flags=["external_loop"]):
+	print(x, end=", ")
+for x in np.nditer(a, flags=["c_index"], order="F"):
+	print(x, end=", ")
+for x in np.nditer(a, flags=["external_loop"], order="F"):
+	print(x, end=", ")
+```
+
+> 广播迭代
+
+如果两个数组是可广播的，nditer组合对象能够同时迭代它们。假设数组a具有维度 3X4并且存在维度为 1X4的另一个数组b，则使用以下类型的迭代器(数组b被广播到a的大小)
+
+```python
+import numpy as np
+a = np.arange(12).reshape(3,4)
+print("第一个数组:")
+print(a)
+print("")
+
+b = np.arange(1, 5)
+print("第二个数组:")
+print(b)
+print("")
+
+for x, y in np.nditer([a, b])
+	print("%d:%d"%(x, y), end=", ")
+print("")
+```
+
+> 修改数组形状
+
+- reshape()
+
+原型:`reshape(shape, order='C')`
+
+作用:不改变数据的条件下修改形状
+
+| 参数  | 说明                                                       |
+| ----- | ---------------------------------------------------------- |
+| shape | 形状                                                       |
+| order | "C" 按行，"F" 按列，"A" 原顺序，"K" 元素在内存中的出现顺序 |
+
+```python
+import numpy as np
+a = np.arange(12)
+print("原始数组:")
+print(a)
+
+b = a.reshape(3, 4)
+print("修改后的数组:")
+print(b)
+```
+
+- flat
+
+一个数组元素迭代器
+
+```python
+import numpy as np
+
+a = np.arange(12).reshape(3, 4)
+print("原始数组:")
+print(a)
+
+print("迭代后的数组:")
+for x in a.flat:
+	print(x)
+```
+
+- flatten()
+
+原型:`flatten(order='C')`
+
+作用:展平的数组元素并拷贝一份，顺序通常是"C风格"
+
+注意:修改返回的数组不会对原数组产生影响
+
+| 参数  | 说明                                                       |
+| ----- | ---------------------------------------------------------- |
+| order | "C" 按行，"F" 按列，"A" 原顺序，"K" 元素在内存中的出现顺序 |
+
+```python
+import numpy as np
+a = np.arange(12).reshape(3, 4)
+print("原始数组:")
+print(a)
+
+#默认按行
+print("展开的数组:")
+b = a.flatten(order='F')
+print(b)
+
+print("以F风格顺序展开的数组:")
+c = a.flatten(order='F')
+print(c)
+print("")
+
+b[0] = 100
+print(b)
+print(a)# b与a是完全不同的两份数据
+```
+
+- ravel()
+
+原型:`numpy.ravel(order='C')`
+
+作用:展平的数组元素，顺序通常是"C风格"，返回的是数组视图(view，有点类似C/C++引|用reference的意味)
+注意:修改会影响原始数组
+
+```python
+import numpy as np
+
+a = np.arange(12).reshape(3,4)
+print("原始数组:")
+print(a)
+print("\n")
+
+print("调用ravel函数之后:")
+b = a.ravel()
+print(b)
+print('\n')
+
+print("以F风格顺序调用ravel函数之后:")
+c = a.ravel(order='F')
+print(c)
+print("")
+
+print("修改数组b之后打印b,a数组")
+b[0] = 1000
+print(b)
+print(a)
+```
+
+### 翻转
+
+> transpose()
+
+原型:`numpy.transpose(a, axes=None)`
+
+作用:对换数组的维度
+
+注意:修改会影响原始数组
+
+
+| 参数 | 说明                                             |
+| ---- | ------------------------------------------------ |
+| a    | 要操作的数组                                     |
+| axes | 整数列表，对应维度；若省略，默认所有维度逆序对换 |
+
+```python
+import numpy as np
+
+a = np.arange(12).reshape(3, 4)
+print("原始数组:")
+print(a)
+print("\n")
+
+print("对换数组:")
+b = np.transpose(a)
+print(b)
+```
+
+> ndarray.T
+
+类似numpy.transpose
+
+```python
+import numpy as np
+
+a = np.arange(12).reshape(3, 4)
+print("原始数组:")
+print(a)
+print("")
+
+print("转置数组:")
+b = a.T
+print(b)
+```
+
+> rollaxis()
+
+原型:`numpy.rollaxis(a, axis, start=0)`
+
+作用:向后滚动特定的轴到一个特定位置
+
+| 参数  | 说明                                                               |
+| ----- | ------------------------------------------------------------------ |
+| a     | 要操作的数组                                                       |
+| axis  | 要向后滚动的轴，其它轴的相对位置不会改变；默认为 0，表示完整的滚动 |
+| start | 滚动后该轴的起始位置（原 `start` 位置的元素会移到轴开头）        |
+
+```python
+import numpy as np
+
+a = np.arange(24).reshape(2,3,4)
+print("原始数组:")
+print(a)
+print(a.shape)
+print("")
+
+print("调用rollaxis函数")
+#将轴2滚动到轴0
+b = np.rollaxis(a, 2)
+print(b)
+print(b.shape)
+print("")
+```
+
+> swapaxes()
+
+原型:`numpy.swapaxes(a, axis1, axis2)`
+
+作用:交换数组的两个轴
+
+| 参数  | 说明               |
+| ----- | ------------------ |
+| a     | 要操作的数组       |
+| axis1 | 对应第一个轴的整数 |
+| axis2 | 对应第二个轴的整数 |
+
+```python
+import numpy as np
+
+a = np.arange(24).reshape(2, 3, 4)
+print("原始数组:")
+print(a)
+print(a.shape)
+print("")
+
+#现在交换轴0到轴2
+print("调用swapaxes函数后的数组:")
+b = np.swapaxes(a, 2, 0)
+print(b)
+prit(b.shape)
+```
+
+### 修改数组维度
+
+> broadcast()
+
+用于模仿广播的对象它返回一个对象，该对象封装了将一个数组广播到另一个数组的结果
+
+```python
+import numpy as np
+
+x = np.array([[1], [2], [4]])
+y = np.array([4, 5, 6])
+print("原始x:")
+print(x)
+print("原始y:")
+print(y)
+print("")
+
+print("对y广播x形成b对象:")
+b = np.broadcast(x, y)
+print(b)
+print("b对象拥有iterator属性，基于自身组件的迭代器元组:")
+r, c = b.iters 
+print(next(r), next(c)) #1 4
+print(next(r), next(c)) #1 5
+print(next(r), next(c)) #1 6
+print(next(r), next(c)) #2 4
+print(next(r), next(c)) #2 5 
+print(next(r), next(c)) #2 6
+print(next(r), next(c)) #4 4
+print(next(r), next(c)) #4 5
+print(next(r), next(c)) #4 6
+# 迭代完毕，不能够再迭代
+```
+
+> broadcast_to()
+
+原型:`numpy.broadcast_to(array, shape, subok=False)`
+
+作用:将数组广播到新形状。它在原始数组上返回只读视图。它通常不连续。如果新形状不符合NumPy的广播规则，该函数可能会抛出ValueError
+
+| 参数  | 说明         |
+| ----- | ------------ |
+| array | 待修改的数组 |
+| shape | 修改后的形状 |
+
+```python
+import numy as np
+
+a = np.arange(4).reshape(1, 4)
+print("原始数组:")
+print(a)
+print("")
+
+b = np.broadcast_to(a, (4, 4))
+print("广播后的数组:")
+print(b)
+```
+
+> expand_dims()
+
+原型:`numpy.squeeze(arr, axis=None)`
+
+作用:通过在指定位置插入新的轴来扩展数组形状
+
+| 参数 | 说明           |
+| ---- | -------------- |
+| arr  | 输入数组       |
+| axis | 新轴插入的位置 |
+
+```python
+import numpy as np
+x = np.arange(1, 5).reshape(2,2)
+print("x数组:")
+print(x)
+print("\n")
+
+y = np.expand_dims(x, axis=0)
+print("y数组:")
+print(y)
+print("")
+
+print("数组x和y的形状和维度:")
+print(x.shape, y.shape)
+print(x.ndim, y.ndim)
+print("")
+
+y = np.expand_dims(x, axis = 1)
+print("在位置1插入轴之后的数组y:")
+print(y)
+print("")
+
+print("数组x和y的形状和维度:")
+print(x.shape, y.shape)
+print(x.ndim, y.ndim)
+```
+
+> squeeze()
+
+原型 `numpy.squeeze(arr, axis)`
+
+作用：从给定数组的形状中删除一维的条目
+
+| 参数 | 说明         |
+| ---- | ------------ |
+| arr  | 输入数组     |
+| axis | 删除轴的位置 |
+
+```python
+import numpy as np
+
+x = np.arange(9).reshape((1,3,3))
+print("x数组:")
+print(x)
+print("\n")
+
+y = np.squeeze(x)
+print("y数组：")
+print(y)
+print("")
+
+print("数组x和y的形状和维度:")
+print(x.shape, y.shape)
+print(x.ndim, y.ndim)
+```
+
+### 连接数组
+
+> concatenate()
+
+原型:`numpy.concatenate((a1, a2, ...), axis)`
+
+作用:用于沿指定轴连接相同形状的两个或多个数组
+
+| 参数        | 说明                         |
+| ----------- | ---------------------------- |
+| a1, a2, ... | 相同类型的数组               |
+| axis        | 沿着它连接数组的轴，默认为 0 |
+
+```python
+import numpy as np
+
+x = np.arange(1, 5).reshape(2, 2)
+print("x数组")
+print(x)
+print("")
+
+y = np.arange(5, 9).reshape(2, 2)
+print("y数组:")
+print(y)
+print("")
+
+print("沿轴0连接两个数组:")
+print(np.concatenate((x,y)))
+print("")
+
+print("沿轴1连接两个数组:")
+print(np.concatenate((x,y), axis=1))
+print("")
+```
+
+> stack()
+
+原型:`numpy.stack(array, axis)`
+
+作用:用于沿新轴连接数组序列
+
+| 参数   | 说明                             |
+| ------ | -------------------------------- |
+| arrays | 相同形状的数组序列               |
+| axis   | 数组中的轴，输入数组沿着它来堆叠 |
+
+```python
+import numpy as np
+
+x = np.arange(1, 5).reshape(2,2)
+print("x数组:")
+print(x)
+print("")
+
+y = np.arange(5, 9).reshape(2,2)
+print("y数组：")
+print(y)
+print("")
+
+print("沿着轴0堆叠两个数组:")
+print(np.stack((x,y), 0))
+print("")
+
+print("沿着轴1堆叠两个数组:")
+print(np.stack((x,y), 1))
+print("")
+```
+
+> hstack()
+
+是 `numpy.stack`的变体，它通过水平堆叠来生成数组
+
+```python
+import numpy as np
+
+x = np.arange(1, 5).reshape(2, 2)
+print("x数组:")
+print(x)
+print("")
+
+y = np.arange(5, 9).reshape(2,2)
+print("y数组:")
+print(y)
+print("\n")
+
+print(np.hstack((x,y)))
+```
+
+> vstack()
+
+是 `numpy.stack`的变体，它通过垂直堆叠来生成数组
+
+import numpy as np
+
+x = np.arange(1, 5).reshape(2, 2)
+print("x数组:")
+print(x)
+print("")
+
+y = np.arange(5, 9).reshape(2,2)
+print("y数组:")
+print(y)
+print("\n")
+
+print(np.vstack((x,y)))
+
+### 分割数组
+
+> split()
+
+原型:`numpy.split(arr, indices_or_sections, axis=0)`
+
+作用:函数沿特定的轴将数组分割为子数组
+
+| 参数                | 说明                                                                             |
+| ------------------- | -------------------------------------------------------------------------------- |
+| ary                 | 被分割的数组                                                                     |
+| indices_or_sections | 如果是一个整数，就用该数平均切分；如果是一个数组，则为沿轴切分的位置（左开右闭） |
+| axis                | 沿着哪个维度进行切向，默认为 0（横向切分）；为 1 时，纵向切分                    |
+
+```python
+import numpy as np
+
+x = np.arange(9)
+print("x数组:")
+print(x)
+print("")
+
+print("将数组分成三个大小相等的子数组:")
+a = np.split(x, 3)
+print(a)
+print("")
+
+print("将数组在一维数组中表明的位置分割:")
+b = np.split(x, [2,7])
+print(b)
+```
+
+> hsplit()
+
+用于水平分割数组，通过指定要返回的相同形状的数组数量来拆分原数组
+
+```python
+import numpy as np
+
+x = np.arange(12).reshape(2, 6)
+print("x数组:")
+print(x)
+print("")
+
+print(np.hsplit(x, 3))
+```
+
+> vsplit()
+
+沿着垂直轴分割，其分割方式与hsplit用法相同
+
+```python
+import numpy as np
+
+x = np.arange(12).reshape(4, 4)
+print("x数组:")
+print(x)
+print("")
+
+print(np.vsplit(x, 3))
+```
+
+### 数组元素的添加与删除
+
+> resize()
+
+原型:`numpy.resize(arr, shape)`
+
+作用:返回指定大小的新数组
+
+| 参数  | 说明             |
+| ----- | ---------------- |
+| arr   | 要修改大小的数组 |
+| shape | 返回数组的新形状 |
+
+```python
+import numpy as np
+
+x = np.arange(6).reshape(2,3)
+print("x数组")
+print(x)
+print("")
+
+y = np.resize(x, (3, 2))
+print("y数组:")
+print(y)
+print(y.shape)
+print("")
+
+# 尺寸变大
+z = np.resize(x, (3, 3))
+print("z数组:")
+print(z)
+print(z.shape)
+print("\n")
+```
+
+> append()
+
+原型:`numpy.append(arr, values, axis=None)`
+
+作用:
+
+在数组的末尾添加值
+
+追加操作会分配整个数组，并把原来的数组复制到新数组中
+
+输入数组的维度必须匹配否则将生成ValueError
+
+| 参数   | 说明                                                                                                                                                                   |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| arr    | 输入数组                                                                                                                                                               |
+| values | 要向 `arr` 添加的值，需要和 `arr` 形状相同（除了要添加的轴）                                                                                                       |
+| axis   | 默认为 `None`。当 `axis` 无定义时，是横向加成，返回总是为一维数组；当 `axis` 有定义时，分别为 0 和 1：为 0 时（列数要相同），为 1 时数组是加在右边（行数要相同） |
+
+```python
+import numpy as np
+
+x = np.arange(6).reshape(2, 3)
+print("x数组:")
+print(x)
+print("")
+
+print(np.append(x, [7, 8, 9]))
+print("")
+print(np.append(x, [[7, 8, 9]], axis=0))
+print("")
+print(np.append(x, [[2, 2],[3,3]], axis=1))
+```
+
+> insert()
+
+原型:`numpy.inster(arr, obj, values, axis)`
+
+作用:在给定索引之前，沿给定轴在输入数组中插入值
+
+注意:如果值的类型转换为要插入，则它与输入数组不同。插入没有原地的，函数会返回一个新数组。此外，如果未提供轴，则输入数组会被展开
+
+
+| 参数   | 说明                                           |
+| ------ | ---------------------------------------------- |
+| arr    | 输入数组                                       |
+| obj    | 在其之前插入值的索引                           |
+| values | 要插入的值                                     |
+| axis   | 沿着它插入的轴；如果未提供，则输入数组会被展开 |
+
+```python
+import numpy as np
+
+x = np.arange(6).reshape(3,2)
+print("x数组:")
+print(x)
+print("")
+
+print("未传递axis参数, 在插入之前输入数组会被展开")
+print(np.insert(a, 3, [11, 12]))
+print("")
+
+print("传递axis参数, 会广播数组来配输入数组")
+print("沿轴0广播:")
+print(np.insert(a, 3, [11, 12]))
+print("")
+```
