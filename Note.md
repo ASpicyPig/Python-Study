@@ -1416,6 +1416,7 @@ class Person:
 如果直接打印实例，看不到实例属性
 
 ```python
+p1 = Person('张三', 18 ,'女')
 print(p1)
 print(p2)
 # <__main__.Person object at 0x000002A8FCF6BB30>
@@ -1836,7 +1837,7 @@ class Student(Person):
         print(f'我是学生({self.name}-{self._age}-{self.__idcard})')
 ```
 
-# getter与setter方法
+### getter与setter方法
 
 使用@property装饰器注册私有或者保护属性的getter方法，当使用成员变量语法访问该私有或保护属性时，getter方法被自动调用
 
@@ -2125,7 +2126,7 @@ atm(100, False)
 
     闭包使得无需定义全局变量即可实现通过函数，持续的访问、修改某个值闭包使用的变量的所用于在函数内**，作用域封闭**，**难以被错误的调用修改。**但由于内部函数持续引用外部函数的值,所以会导致这一部分内存空间不被释放,一直占用内存（缺点）
 
-## 装饰器
+### 装饰器
 
 装饰器其实也是一种闭包，其功能就是在**不破坏目标函数原有的代码和功能的前提下,为目标函数增加新功能**。
 
@@ -2489,9 +2490,6 @@ def relax(msg):
     while True:
         print(f"我在{msg}...")
         time.sleep(1)
-
-
-
 if __name__ == "__main__":
     # 创建写代码线程
     code_thread = threading.Thread(target=code, args=("写python",))
@@ -2592,7 +2590,7 @@ IPython之所以比默认的“Python shell”交互性更强、使用更方便�
   作用:将剪切板中复制的代码直接粘贴到IPython中并自动执行
 
   ![1765981136914](image/Note/1765981136914.png)![1765981207136](image/Note/1765981207136.png)
-- cpaste
+- %cpaste
 
   作用:与%paste命令类似，也是粘贴文本，但有所不同的是%cpaste命令在输入后会出现提示信息。提示信息的意思是可不断粘贴代码到IPython中，直到输入"“并回车或使用Ctr1+D结束粘贴。在需粘贴的代码量比较大时，可实现代码的分步粘贴，粘贴完成可手动结束，且不用担心代码被提前执行，极大方便了操作者
 - %reset
@@ -2706,7 +2704,6 @@ pip install jupyter
 
 NumPy(Numerical Python)是 Python 语言的一个扩展程序库，支持大量的维度数组与矩阵运算，此外也针对数组运算提供大量的数学函数库
 
-
 NumPy 的前身 Numeric 最早是由 Jim Hugunin 与其它协作者共同开发，2005 年，Travis Oliphant 在 Numeric 中结合了另一个同性质的程序库 Numarray 的特色，并加入了其它扩展而开发了 NumPy。NumPy为开放源代码并且由许多协作者共同维护开发
 
 > 作用
@@ -2718,7 +2715,7 @@ NumPy 是一个运行速度非常快的数学库，主要用于数组计算
 - 一个强大的N维数组对象 ndarray
 - 广播功能函数
 - 整合 C/C++/Fortran 代码的工具
-- 线性代数、傅里叶变换、随机数生成等功能
+- 线性代数(numpy.linalg)、傅里叶变换、随机数生成等功能
 
 > 优势
 
@@ -2751,7 +2748,7 @@ conda install numpy
 
 > 介绍
 
-- NumPy 最重要的一个特点是其 N 维数组对象 ndarray，它是一系列同类型数据的集合，以0下标为开始进行集合中元素的索引
+- NumPy 最重要的一个特点是其 N 维数组对象 ndarray，它是一系列**同****类型数据**的集合，以0下标为开始进行集合中元素的索引
 - ndarray 对象是用于存放同类型元素的多维数组
 - ndarray 中的每个元素在内存中都有相同存储大小的区域
 
@@ -2768,7 +2765,6 @@ conda install numpy
 
 numpy 支持的数据类型比 Python 内置的类型要多很多，基本上可以和C语言的数据类型对应上，其中部分类型对应为 Python 内置的类型
 numpy 的数值类型实际上是 dtype 对象的实例，并对应唯一的字符，包括 np.bool_,np.int32,np.float32
-
 
 | 类型       | 说明                                                                       |
 | ---------- | -------------------------------------------------------------------------- |
@@ -2857,7 +2853,6 @@ numpy.array(object, dtype = None, copy = True, order = None, subok = False, ndmi
 
 作用：创建Ndarray数组对象
 
-
 | 参数   | 说明                                                         |
 | ------ | ------------------------------------------------------------ |
 | object | 数组或嵌套的数列                                             |
@@ -2908,7 +2903,6 @@ numpy.empty(shape, dtype = float, order = 'C)
 ```
 
 作用:创建一个指定形状(shape)、数据类型(dtype)且未初始化的数组
-
 
 | 参数  | 说明                                                                         |
 | ----- | ---------------------------------------------------------------------------- |
@@ -3512,6 +3506,7 @@ print(arr[1,...])
 print("-----------")
 print(arr[...,1:])
 ```
+
 ### 高级索引
 
 NumPy 比一般的 Python 序列提供更多的索引方式。除了之前看到的用整数和切片的索引外，数组可以由整数数组索引、布尔索引
@@ -3591,7 +3586,6 @@ a = np.array([1, 2, 3, 4])
 b = np.array([10, 20, 30, 40])
 c = a + b
 print(c)
-
 ```
 
 **形状不同**
@@ -3621,7 +3615,7 @@ print(a + bb)
 
 - 让所有输入数组都向其中形状最长的数组看齐，形状中不足的部分都通过在前面加1补齐
 - 输出数组的形状是输入数组形状的各个维度上的最大值
-- 如果输入数组的某个维度和输出数组的对应维度的长度相同或者其长度为1时，这个数组能够用来计算，否则出错
+- 如果输入数组的某个维度和输出数组的对应维度的**长度相同或者其长度为1**时，这个数组能够用来计算，否则出错
 - 当输入数组的某个维度的长度为1时，沿着此维度运算时都用此维度上的第一组值
 
 > 简单理解
@@ -3683,8 +3677,6 @@ print("")
 ```
 
 > 控制遍历顺序
-
-
 
 | 顺序          | 说明     | 使用方式                                |
 | ------------- | -------- | --------------------------------------- |
@@ -3903,7 +3895,6 @@ print(a)
 作用:对换数组的维度
 
 注意:修改会影响原始数组
-
 
 | 参数 | 说明                                             |
 | ---- | ------------------------------------------------ |
@@ -4360,12 +4351,11 @@ print(np.append(x, [[2, 2],[3,3]], axis=1))
 
 > insert()
 
-原型:`numpy.inster(arr, obj, values, axis)`
+原型:`numpy.insert(arr, obj, values, axis)`
 
 作用:在给定索引之前，沿给定轴在输入数组中插入值
 
 注意:如果值的类型转换为要插入，则它与输入数组不同。插入没有原地的，函数会返回一个新数组。此外，如果未提供轴，则输入数组会被展开
-
 
 | 参数   | 说明                                           |
 | ------ | ---------------------------------------------- |
@@ -4383,11 +4373,288 @@ print(x)
 print("")
 
 print("未传递axis参数, 在插入之前输入数组会被展开")
-print(np.insert(a, 3, [11, 12]))
+print(np.insert(x, 3, [11, 12]))
 print("")
 
-print("传递axis参数, 会广播数组来配输入数组")
+print("传递axis参数, 会广播数组来匹配输入数组")
 print("沿轴0广播:")
-print(np.insert(a, 3, [11, 12]))
+print(np.insert(x, 1, [11], axis = 0))
 print("")
+
+print("沿轴1广播:")
+print(np.insert(a, 1, 11, axis = 1))
+print("")
+```
+
+> delete()
+
+原型:`numpy.delete(arr, obj, axis)`
+
+作用:返回从输入数组中删除指定子数组的新数组。与insert()函数的情况一样，如果未提供轴参数，则输入数组将展开
+
+| 参数 | 说明                                                       |
+| ---- | ---------------------------------------------------------- |
+| arr  | 输入数组                                                   |
+| obj  | 可以被切片、整数或者整数数组，表明要从输入数组删除的子数组 |
+| axis | 沿着它删除给定子数组的轴；如果未提供，则输入数组会被展开   |
+
+```python
+import numpy as np
+
+x = np.arange(2, 14).reshape(3, 4)
+print(x)
+
+a = np.delete(x, 4)
+# 若不指定轴，会展开成一维数组，然后删除指定位置
+print(a)
+
+b = np.delete(x, 1, axis=1)
+print(b)
+
+c = np.delete(x, 1, axis=0)
+print(c)
+```
+
+> unique()
+
+原型：`numpy.unique(arr, return_index, return_inverse, return counts)`
+
+作用:去除数组中的重复元素
+
+| 参数           | 说明                                                                  |
+| -------------- | --------------------------------------------------------------------- |
+| arr            | 输入数组，如果不是一维数组则会展开                                    |
+| return_index   | 如果为 true，返回新列表元素在旧列表中的位置（下标），并以列表形式存储 |
+| return_inverse | 如果为 true，返回旧列表元素在新列表中的位置（下标），并以列表形式存储 |
+| return_counts  | 如果为 true，返回去重数组中的元素在原数组中的出现次数                 |
+
+```python
+import numpy as np
+
+x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 2, 11, 2, 33, 3, 4])
+print("x数组:")
+print(x)
+print("")
+
+print(np.unique(x))
+print("")
+
+# 第一个非重元素下标
+print(np.unique(x, return_index=True))
+print("")
+
+# 旧列表在新列表中的位置
+print(np.unique(x, return_inverse=True))
+print("")
+
+# 去重数组中的元素在原数组中的出现次数
+print(np.unique(x, return_counts=True))
+print("")
+```
+
+### Matplotlib
+
+> 简介
+
+Matplotlib最初由John D.Hunter于2003年编写
+
+Matplotlib是用于数据可视化的最流行的Python包之一
+
+它是一个跨平台库，用于根据数组中的数据制作2D图
+
+Matplotlib是用Python编写的，并使用了Python的数值数学扩展NumPy
+
+它提供了一个面向对象的API，有助于使用Python GUl工具包(如PyQt,WxPythonotTkinter)在应用程序中嵌入绘图
+
+它也可以用于Python和IPython shell，Jupyter笔记本和Web应用程序服务器
+
+Matplotlib和NumPy可以被认为是MATLAB的开源等价物
+
+Pillow可以使用的唯一数据类型是uint8
+
+> pyplot的API
+
+matplotlib.pyplot是命令样式函数的集合，使Matplotlib像MATLAB一样工作。每个Pyplot功能都会对图形进行一些更改。例如，函数创建一个图形，一个图形中的绘图区域，绘制绘图区域中的一些线条，用标签装饰图形等
+
+**可以绘制的图表类型**
+
+| 函数          | 描述                       |
+| ------------- | -------------------------- |
+| `Bar`       | 绘制条形图（柱状图）。     |
+| `Barh`      | 绘制水平条形图。           |
+| `Boxplot`   | 绘制箱形图（箱线图）。     |
+| `Hist`      | 绘制直方图。               |
+| `Hist2d`    | 绘制二维直方图。           |
+| `Pie`       | 绘制饼图。                 |
+| `Plot`      | 绘制折线图和/或标记。      |
+| `Polar`     | 绘制极坐标图。             |
+| `Scatter`   | 绘制 x 与 y 的散点图。     |
+| `Stackplot` | 绘制堆积面积图。           |
+| `Stem`      | 绘制杆图（火柴杆图）。     |
+| `Step`      | 绘制阶梯图。               |
+| `Quiver`    | 绘制二维矢量场（箭头图）。 |
+
+**图像函数**
+
+| 函数       | 描述                     |
+| ---------- | ------------------------ |
+| `Imread` | 将文件中的图像读入数组。 |
+| `Imsave` | 将数组保存为图像文件。   |
+| `Imshow` | 在轴上显示图像。         |
+
+**轴函数**
+
+| 函数       | 描述                                |
+| ---------- | ----------------------------------- |
+| `Axes`   | 添加轴到图形。                      |
+| `Text`   | 向轴添加文本。                      |
+| `Title`  | 设置当前轴的标题。                  |
+| `Xlabel` | 设置当前轴的 x 轴标签。             |
+| `Xlim`   | 获取或设置当前轴的 x 轴范围。       |
+| `Xscale` | 设置 x 轴的缩放比例。               |
+| `Xticks` | 获取或设置当前 x 轴刻度位置和标签。 |
+| `Ylabel` | 设置当前轴的 y 轴标签。             |
+| `Ylim`   | 获取或设置当前轴的 y 轴范围。       |
+| `Yscale` | 设置 y 轴的缩放比例。               |
+| `Yticks` | 获取或设置当前 y 轴刻度位置和标签。 |
+
+**图形函数**
+
+| 函数        | 描述               |
+| ----------- | ------------------ |
+| `Figtext` | 将文字添加到图形。 |
+| `Figure`  | 创建一个新的图形。 |
+| `Show`    | 显示一个图形。     |
+| `Savefig` | 保存当前图形。     |
+| `Close`   | 关闭一个图窗口。   |
+
+> 简单画图
+
+显示一个简单的角度线图，以弧度为单位，与正弦值相对应
+
+```python
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+
+# 在Jupyter Notebook内部显示绘图输出的魔术方法(不是在单独的查看器中显示)
+%matplotlib inline
+
+x = np.arange(0, math.pi*2, 0.05)
+y = np.sin(x)
+
+print("x:")
+print(x)
+print("")
+print("y")
+print(y)
+print("\n")
+
+#绘图
+plt.plot(x, y)
+plt.show()
+```
+
+### pylab模块
+
+Matplotlib是整个包，matplotlib.pyplot是Matplotlib中的一个模块，它和PyLab是一个与Matplotlib一起安装的模块。
+
+PyLab是Matplotlib面向对象绘图库的过程接口，是一个非常方便模块，可以在单个名称空间中批量导入matplotlib.pyplot(用于绘图)和NumPy(用于数学和使用数组)。虽然有许多示例使用PyLab，但不再推荐使用它
+
+> 基本绘图
+
+```python
+import numpy as np
+import pylab as plb
+
+x = np.linspace(-3, 3, 30)
+y = x**2
+
+plb.plot(x, y)
+plb.show()
+```
+
+> 线的颜色与样式
+
+颜色:`b`，`g`，`r`，`c`，`m`，`y`，`k`，`w`
+样式:`^`,`v`,`<`,`>`,`s`,`+`,`x`,`D`,`d`,`1`,`2`,`3`,`4`,`h`,`H`,`p`,|,`_`,`-`,`--`,`-.`,`.`,`,`,`。`
+
+```python
+import numpy as np
+import pylab as plb
+
+x = np.linspace(-3, 3, 30)
+y = x**2
+
+plb.plot(x, y, "r1")
+plb.show()
+```
+
+> 使用多个绘图命令实现覆盖图
+
+```python
+import numpy as np
+import pylab as plb
+
+x = np.linspace(-3, 3, 30)
+
+plb.plot(x, np.sin(x))
+plb.plot(x, np.cos(x), 'r-')
+plb.plot(x, -np.sin(x), 'g--')
+plb.show()
+```
+
+> 使用clf()清除绘图
+
+```python
+import numpy as np
+import pylab as plb
+
+x = np.linspace(-3, 3, 30)
+
+plb.plot(x, np.sin(x))
+plb.plot(x, np.cos(x), 'r-')
+plb.plot(x, -np.sin(x), 'g--')
+plb.clf()
+plb.show()
+```
+
+### 使用面向对象思想绘图
+
+虽然使用matplotlib.pyplot模块很容易快速生成绘图，但建议使用面向对象的方法，因为它可以更好地控制和自定义绘图，并且**matplotlib.axes.Axes**类中也提供了大多数函数
+
+使用更正式的面向对象方法背后的主要思想是创建图形对象，然后只调用该对象的方法或属性，这种方法有助于更好地处理其上有多个绘图的画布
+在面向对象的界面中，pyplot仅用于一些功能，如图形创建，用户显式创建和跟踪图形和轴对象。在此级别，用户使用pyplot创建图形，通过这些图形，可以创建一个或多个轴对象。然后，这些轴对象用于大多数绘图操作
+
+> Figure类
+
+matplotlib.figure模块包含Figure类，它是所有plot元素的顶级容器，通过从pyplot模块调用figure()函数来实例化Figure对象
+
+```python
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+fig = plt.figure()
+print(fig)
+```
+
+| 参数          | 描述                                   |
+| ------------- | -------------------------------------- |
+| `Figsize`   | `(width, height)` 以英寸为单位的元组 |
+| `Dpi`       | 每英寸点数                             |
+| `Facecolor` | 图的贴面颜色                           |
+| `Edgecolor` | 图的边缘颜色                           |
+| `Linewidth` | 边线宽度                               |
+
+> Axes类
+
+Axes对象是具有数据空间的图像区域。给定的图形可以包含许多轴，但给定的Axes对象只能在一个图中。轴包含两个(或在3D情况下为三个)Axes对象。Axes类及其成员函数是使用OOP接口的主要入口点
+figure对象通过调用add_axes()方法将Axes对象添加到图中。它返回轴对象并在位置rect[left，bottom，width，height]添加一个轴，其中所有数量都是图形宽度和高度的分数add_axes()的参数是4个长度序列的[左，底，宽，高]数量。轴类的以下成员函数为图添加了不同的元素
+
+```python
+import matplotlib.pyplot as plt
+%matplotlib inline
+fig = plt.figure()
+ax = fig.add_axes([0, 0, 1, 1])
+print(ax)
 ```
